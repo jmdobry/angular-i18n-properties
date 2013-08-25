@@ -20,6 +20,7 @@ The goal of the project is to solve a general problem, not satisfy a specific sc
 1. [Download](#download)
 1. [Install](#installation)
 1. [Usage](#usage)
+1. [Roadmap](#roadmap)
 1. [Changelog](#changelog)
 1. [Contributing](#contributing)
 1. [License](#license)
@@ -74,6 +75,21 @@ angular.module('myApp', ['jmdobry.angular-i18n-properties']);
 See [angular-i18n-properties](http://jmdobry.github.io/angular-i18n-properties/docs/module-angular-i18n-properties.html)
 
 ### [API Documentation](http://jmdobry.github.io/angular-i18n-properties/docs/)
+
+<a name='roadmap'></a>
+## Roadmap
+
+#### 0.4.0
+- Core features complete.
+
+#### 0.6.0
+- Unit tests complete.
+
+#### 0.8.0
+- Demo and documentation complete
+
+#### 1.0.0
+- Stable 1.0.0 Release
 
 <a name='changelog'></a>
 ## Changelog
