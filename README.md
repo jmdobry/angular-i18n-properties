@@ -1,4 +1,4 @@
-angular-i18n-properties
+angular-i18n-properties (Pre-release 0.4.0-SNAPSHOT)
 =======================
 
 Internationalization (i18n) for Angular.js using the common Java .properties resource bundles.
@@ -34,9 +34,9 @@ _put list of features here_
 ## Status
 | Version | Branch  | Build status                                                                                                                                                              | Test Coverage |
 | ------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| 0.0.1-SNAPSHOT   | [master](https://github.com/jmdobry/angular-i18n-properties)  | [![Build Status](https://travis-ci.org/jmdobry/angular-i18n-properties.png?branch=master)](https://travis-ci.org/jmdobry/angular-i18n-properties) | [Test Coverage](http://jmdobry.github.io/angular-i18n-properties/coverage/) |
-| 0.0.1-SNAPSHOT   | [develop](https://github.com/jmdobry/angular-i18n-properties/tree/develop) | [![Build Status](https://travis-ci.org/jmdobry/angular-i18n-properties.png?branch=develop)](https://travis-ci.org/jmdobry/angular-i18n-properties) | |
-| 0.0.1-SNAPSHOT   | [all](https://drone.io/github.com/jmdobry/angular-i18n-properties) | [![Build Status](https://drone.io/github.com/jmdobry/angular-i18n-properties/status.png)](https://drone.io/github.com/jmdobry/angular-i18n-properties/latest)
+| 0.4.0-SNAPSHOT   | [master](https://github.com/jmdobry/angular-i18n-properties)  | [![Build Status](https://travis-ci.org/jmdobry/angular-i18n-properties.png?branch=master)](https://travis-ci.org/jmdobry/angular-i18n-properties) | [Test Coverage](http://jmdobry.github.io/angular-i18n-properties/coverage/) |
+| 0.4.0-SNAPSHOT   | [develop](https://github.com/jmdobry/angular-i18n-properties/tree/develop) | [![Build Status](https://travis-ci.org/jmdobry/angular-i18n-properties.png?branch=develop)](https://travis-ci.org/jmdobry/angular-i18n-properties) | |
+| 0.4.0-SNAPSHOT   | [all](https://drone.io/github.com/jmdobry/angular-i18n-properties) | [![Build Status](https://drone.io/github.com/jmdobry/angular-i18n-properties/status.png)](https://drone.io/github.com/jmdobry/angular-i18n-properties/latest)
 
 <a name='download'></a>
 ## Download
@@ -44,8 +44,8 @@ _put list of features here_
 #### Latest Stable Version
 | Type          | File | Size |
 | ------------- | ----------------- | ------------------- | ---- |
-| Production    | [angular-i18n-properties-0.0.1-SNAPSHOT.min.js](https://raw.github.com/jmdobry/angular-i18n-properties/master/dist/angular-i18n-properties-0.0.1-SNAPSHOT.min.js) | 6 KB |
-| Development   | [angular-i18n-properties-0.0.1-SNAPSHOT.js](https://raw.github.com/jmdobry/angular-i18n-properties/master/dist/angular-i18n-properties-0.0.1-SNAPSHOT.js) | 34 KB |
+| Production    | [angular-i18n-properties-0.4.0-SNAPSHOT.min.js](https://raw.github.com/jmdobry/angular-i18n-properties/master/dist/angular-i18n-properties-0.4.0-SNAPSHOT.min.js) | 6 KB |
+| Development   | [angular-i18n-properties-0.4.0-SNAPSHOT.js](https://raw.github.com/jmdobry/angular-i18n-properties/master/dist/angular-i18n-properties-0.4.0-SNAPSHOT.js) | 34 KB |
 
 <a name='installation'></a>
 ## Installation
