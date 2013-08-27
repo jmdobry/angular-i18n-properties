@@ -35,7 +35,7 @@
 			var langHash = {},
 				unicodeSequenceRegex = /(\\u.{4})/ig,
 				naturalLinesRegex = /[(\r\n)\n\r]+/,
-				escapedWhitespaceRegex = /\\\s+?/,
+				escapedKeyDelimRegex = /\\[\s=:]+?/,
 				keyDelimRegex = /[=:]|\s+[=:]|\s+(?![=:])/;
 
 			/**
@@ -156,21 +156,21 @@
 				parse: function (file) {
 					var properties = {},
 						naturalLines = file.split(naturalLinesRegex),
-						naturalLine, i, escapedSpaceMatch, keyDelimMatch, unescapedWhiteSpace, matchIndex, key, value;
+						naturalLine, i, escapedKeyDelimMatch, keyDelimMatch, unescapedWhiteSpace, matchIndex, key, value;
 
 					for (i = 0; i < naturalLines.length; i++) {
 						naturalLine = trim_left(naturalLines[i]);
 						var tempKey = '';
 						if (naturalLine[0] !== '#' && naturalLine[0] !== '!') {
 							// This would be much simpler if JavaScript regex supported negative lookbehind
-							escapedSpaceMatch = naturalLine.match(escapedWhitespaceRegex);
+							escapedKeyDelimMatch = naturalLine.match(escapedKeyDelimRegex);
 							keyDelimMatch = naturalLine.match(keyDelimRegex);
 							// handle escaped whitespace in the key
-							if (escapedSpaceMatch && keyDelimMatch) {
-								while (escapedSpaceMatch && keyDelimMatch && naturalLine.indexOf(escapedSpaceMatch.toString()) < naturalLine.indexOf(keyDelimMatch.toString())) {
-									tempKey += naturalLine.substr(0, naturalLine.indexOf(escapedSpaceMatch.toString())) + escapedSpaceMatch.toString()[1];
-									naturalLine = naturalLine.substr(naturalLine.indexOf(escapedSpaceMatch.toString()) + escapedSpaceMatch.toString().length);
-									escapedSpaceMatch = naturalLine.match(escapedWhitespaceRegex);
+							if (escapedKeyDelimMatch && keyDelimMatch) {
+								while (escapedKeyDelimMatch && keyDelimMatch && naturalLine.indexOf(escapedKeyDelimMatch.toString()) < naturalLine.indexOf(keyDelimMatch.toString())) {
+									tempKey += naturalLine.substr(0, naturalLine.indexOf(escapedKeyDelimMatch.toString())) + escapedKeyDelimMatch.toString()[1];
+									naturalLine = naturalLine.substr(naturalLine.indexOf(escapedKeyDelimMatch.toString()) + escapedKeyDelimMatch.toString().length);
+									escapedKeyDelimMatch = naturalLine.match(escapedKeyDelimRegex);
 									keyDelimMatch = naturalLine.match(keyDelimRegex);
 								}
 							}

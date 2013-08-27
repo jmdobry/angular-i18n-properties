@@ -71,7 +71,11 @@ describe('angular-i18n-properties', function () {
 						'spaced key': 'spaced key',
 						'space.equal': 'equal = space',
 						'space.colon': 'colon : space',
-						'equal equal equal': 'value'
+						'equal equal equal': 'value',
+						'equal=': 'value',
+						'=:': ':=',
+						':=': '=:',
+						'space with equal and colon =:': 'val{0}ue {0}{0}space{1}{2}{1}'
 					});
 				});
 			});
