@@ -35,164 +35,239 @@
  * @overview Internationalization (i18n) for Angular.js using the common Java .properties resource bundles.
  */
 (function (window, angular, undefined) {
-    'use strict';
+	'use strict';
 
-    /**
-     * @module angular-i18n-properties
-     * @desc Internationalization (i18n) for Angular.js using the common Java .properties resource bundles.
-     */
-    var i18n = angular.module('jmdobry.angular-i18n-properties', ['ng']);
+	/**
+	 * @module angular-i18n-properties
+	 * @desc Internationalization (i18n) for Angular.js using the common Java .properties resource bundles.
+	 */
+	var i18n = angular.module('jmdobry.angular-i18n-properties', ['ng']);
 
-    angular.module('jmdobry.angular-i18n-properties').service('I18nService', ['$log', function ($log) {
+	angular.module('jmdobry.angular-i18n-properties').provider('I18nService', function () {
 
-        var langHash = {};
+		var config = {};
 
-        /**
-         * @method trim_left
-         * @desc Strip leading whitespace from the given string.
-         * @param {String} value The string to trim.
-         * @returns {String}
-         */
-        function trim_left(value) {
-            return typeof value == 'string' ? value.replace(/^\s*/, '') : value;
-        }
+		config.lang = navigator.language || navigator.userLanguage;
 
-        /**
-         * @method trim_right
-         * @desc Strip trailing whitespace from the given string.
-         * @param {String} value The string to trim.
-         * @returns {String}
-         */
-        function trim_right(value) {
-            return typeof value == 'string' ? value.replace(/\s*$/, '') : value;
-        }
+		/**
+		 * @method config
+		 * @desc Set the global configuration for I18nService.
+		 * @param {Object} options
+		 */
+		this.config = function (options) {
+			config = angular.extend(config, options);
+		};
 
-        /**
-         * @method unescape
-         * @desc Unescape valid escape characters and drop the backslash for invalid escape characters.
-         * @param {String} value The string to unescape.
-         * @returns {String}
-         */
-        function unescape(value) {
-            if (typeof(value) == 'string') {
-                var i = 0;
-                while ((i = value.indexOf('\\', i)) != -1) {
-                    if (value[i + 1] == 't') {
-                        value = value.substring(0, i) + '\t' + value.substring((i++) + 2); // tab
-                    } else if (value[i + 1] == 'r') {
-                        value = value.substring(0, i) + '\r' + value.substring((i++) + 2); // return
-                    } else if (value[i + 1] == 'n') {
-                        value = value.substring(0, i) + '\n' + value.substring((i++) + 2); // line feed
-                    } else if (value[i + 1] == 'f') {
-                        value = value.substring(0, i) + '\f' + value.substring((i++) + 2); // form feed
-                    } else if (value[i + 1] == '\\') {
-                        value = value.substring(0, i) + '\\' + value.substring((i++) + 2); // \
-                    } else {
-                        value = value.substring(0, i) + value.substring(i + 1); // Invalid escape character
-                    }
-                }
-            }
-            return value;
-        }
+		this.$get = ['$log', function ($log) {
+			var langHash = {},
+				unicodeSequenceRegex = /(\\u.{4})/ig,
+				naturalLinesRegex = /[(\r\n)\n\r]+/,
+				escapedWhitespaceRegex = /\\\s+?/,
+				keyDelimRegex = /[=:]|\s+[=:]|\s+(?![=:])/;
 
-        /**
-         * @method parse
-         * @desc Parse the given .properties file and return the hash of key-value pairs.
-         * @param {String} file
-         * @returns {Object}
-         */
-        function parse(file) {
-            var properties = {},
-                naturalLines = file.split(/[(\r\n)\n\r]+/),
-                numNaturalLines = naturalLines.length,
-                foundKey = false,
-                i = 0,
-                j = 0,
-                naturalLine = '',
-                numChars = 0;
+			/**
+			 * @method normalizeLang
+			 * @desc Format the language code into the following format: aa_AA.
+			 * @param {String} lang The language code to normalize.
+			 * @returns {String}    The normalized language code.
+			 */
+			function normalizeLang(lang) {
+				lang = lang.toLowerCase();
+				if (lang.length >= 5) {
+					lang = lang.substr(0, 2) + '_' + lang.substr(3).toUpperCase();
+				}
+				return lang;
+			}
 
-            function addProp(splitIndex, logicalLine) {
-                properties[unescape(trim_right(logicalLine.substr(0, splitIndex)))] = unescape(trim_left(logicalLine.substr(splitIndex + 1, logicalLine.length)));
-            }
+			/**
+			 * @method trim_left
+			 * @desc Strip leading whitespace from the given string.
+			 * @param {String} value    The string to trim.
+			 * @returns {String}        The trimmed string.
+			 */
+			function trim_left(value) {
+				return typeof value == 'string' ? value.replace(/^\s*/, '') : value;
+			}
 
-            for (; i &lt; numNaturalLines; i++) {
-                naturalLine = trim_left(naturalLines[i]);
-                numChars = naturalLine.length;
-                if (naturalLine[0] !== '#' && naturalLine[0] !== '!') {
-                    // These next 20 lines of code would be much simpler if JavaScript regex supported negative lookbehind
-                    // un-escaped '=' and ':' characters get precedence over un-escaped ' ' when parsing the key
-                    for (; j &lt; numChars; j++) {
-                        if (naturalLine[j] === '=' || naturalLine[j] === ':') {
-                            if ((j === 0) || (j > 0 && naturalLine[j - 1] !== '\\')) {
-                                addProp(j, naturalLine);
-                                foundKey = true;
-                                break;
-                            }
-                        }
-                    }
-                    // We didn't find un-escaped '=' and ':' characters, so now look for the first un-escaped ' ' to parse the key
-                    if (!foundKey) {
-                        for (j = 0; j &lt; numChars; j++) {
-                            if (naturalLine[j] === ' ') {
-                                if (j > 0 && naturalLine[j - 1] !== '\\') {
-                                    addProp(j, naturalLine);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                foundKey = false;
-            }
-            return properties;
-        }
+			/**
+			 * @method trim_right
+			 * @desc Strip trailing whitespace from the given string.
+			 * @param {String} value    The string to trim.
+			 * @returns {String}        The trimmed string.
+			 */
+			function trim_right(value) {
+				return typeof value == 'string' ? value.replace(/\s*$/, '') : value;
+			}
 
-        /**
-         * @class I18nService
-         */
-        return {
-            get: function () {
+			/**
+			 * @method unescapeUnicodeChar
+			 * @desc Unescape a unicode characters.
+			 * @param {String} str  The string to unescape.
+			 * @returns {string}    The unescaped string.
+			 */
+			function unescapeUnicodeChar(str) {
+				// unescape unicode codes
+				var codes = [],
+					unescaped = '',
+					code, i, numOfCodes;
+				code = parseInt(str.substr(2), 16);
+				if (code >= 0 && code &lt; Math.pow(2, 16)) {
+					codes.push(code);
+				}
+				numOfCodes = codes.length;
+				for (i = 0; i &lt; numOfCodes; ++i) {
+					unescaped += String.fromCharCode(codes[i]);
+				}
+				return unescaped;
+			}
 
-            },
+			/**
+			 * @method sanitize
+			 * @desc Unescape valid escape characters and drop the backslash for invalid escape characters.
+			 * @param {String} value    The string to unescape.
+			 * @returns {String}        The unescaped string.
+			 */
+			function sanitize(value) {
+				if (typeof value == 'string') {
+					var unicodeChars = value.match(unicodeSequenceRegex),
+						numUnicodeChars, i;
+					if (unicodeChars) {
+						numUnicodeChars = unicodeChars.length;
+						for (i = 0; i &lt; numUnicodeChars; i++) {
+							value = value.replace(unicodeChars[i], unescapeUnicodeChar(unicodeChars[i]));
+						}
+					}
+					i = 0;
+					while ((i = value.indexOf('\\', i)) != -1) {
+						if (value[i + 1] == 't') {
+							value = value.substring(0, i) + '\t' + value.substring((i++) + 2); // tab
+						} else if (value[i + 1] == 'r') {
+							value = value.substring(0, i) + '\r' + value.substring((i++) + 2); // return
+						} else if (value[i + 1] == 'n') {
+							value = value.substring(0, i) + '\n' + value.substring((i++) + 2); // line feed
+						} else if (value[i + 1] == 'f') {
+							value = value.substring(0, i) + '\f' + value.substring((i++) + 2); // form feed
+						} else if (value[i + 1] == '\\') {
+							value = value.substring(0, i) + '\\' + value.substring((i++) + 2); // \
+						} else {
+							value = value.substring(0, i) + value.substring(i + 1); // Invalid escape character
+						}
+					}
+				}
+				return value;
+			}
 
-            /**
-             * @method load
-             * @desc Very simple load method for now.
-             * @param {String} url
-             * @param {Object} options
-             */
-            load: function (url, options) {
-                var req = new XMLHttpRequest();
-                req.open("GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), true);
+			/**
+			 * @class I18nService
+			 */
+			return {
 
-                req.onreadystatechange = function (event) {
-                    var status, err;
-                    if (req.readyState === 4) {
-                        status = req.status;
-                        if (status > 399 && status &lt; 600) {
-                            err = new Error(url + ' HTTP status: ' + status);
-                            err.xhr = req;
-                            err.event = event;
-                            $log.error(err);
-                        } else {
-                            var lang = (options && options.lang) || navigator.language /* Mozilla */ || navigator.userLanguage /* IE */;
-                            if (!langHash[lang]) {
-                                langHash[lang] = angular.extend({}, parse(req.responseText));
-                            } else {
-                                langHash[lang] = angular.extend(langHash[lang], parse(req.responseText));
-                            }
-                            $log.info(langHash);
-                        }
-                    }
-                };
-                req.send(null);
-            }
-        };
-    }]);
+				/**
+				 * @method get
+				 * @desc Return the value of the given key.
+				 * @param {String} key      The key by which to retrieve the value.
+				 * @param {Array} params    Any parameters that will be inserted into the value.
+				 * @param {String} lang     The language to retrieve the value from.
+				 * @return {String}         The value of the given key.
+				 */
+				get: function (key, params, lang) {
+					return langHash[lang || config.lang][key];
+				},
 
-    angular.module('jmdobry.angular-i18n-properties').filter('i18n', ['$log', function ($log) {
+				/**
+				 * @method parse
+				 * @desc Parse the given .properties file and return the hash of key-value pairs.
+				 * @param {String} file     The .properties file to parse.
+				 * @returns {Object} The    key-value pairs of the parsed .properties file.
+				 */
+				parse: function (file) {
+					var properties = {},
+						naturalLines = file.split(naturalLinesRegex),
+						naturalLine, i, escapedSpaceMatch, keyDelimMatch, unescapedWhiteSpace, matchIndex, key, value;
 
-    }]);
+					for (i = 0; i &lt; naturalLines.length; i++) {
+						naturalLine = trim_left(naturalLines[i]);
+						var tempKey = '';
+						if (naturalLine[0] !== '#' && naturalLine[0] !== '!') {
+							// This would be much simpler if JavaScript regex supported negative lookbehind
+							escapedSpaceMatch = naturalLine.match(escapedWhitespaceRegex);
+							keyDelimMatch = naturalLine.match(keyDelimRegex);
+							// handle escaped whitespace in the key
+							if (escapedSpaceMatch && keyDelimMatch) {
+								while (escapedSpaceMatch && keyDelimMatch && naturalLine.indexOf(escapedSpaceMatch.toString()) &lt; naturalLine.indexOf(keyDelimMatch.toString())) {
+									tempKey += naturalLine.substr(0, naturalLine.indexOf(escapedSpaceMatch.toString())) + escapedSpaceMatch.toString()[1];
+									naturalLine = naturalLine.substr(naturalLine.indexOf(escapedSpaceMatch.toString()) + escapedSpaceMatch.toString().length);
+									escapedSpaceMatch = naturalLine.match(escapedWhitespaceRegex);
+									keyDelimMatch = naturalLine.match(keyDelimRegex);
+								}
+							}
+							if (keyDelimMatch) {
+								unescapedWhiteSpace = null;
+								matchIndex = naturalLine.indexOf(keyDelimMatch.toString());
+								key = tempKey + naturalLine.substr(0, matchIndex);
+
+								// Check for unescaped whitespace
+								unescapedWhiteSpace = key.match(/\s*$/);
+								if (unescapedWhiteSpace && unescapedWhiteSpace.toString().length) {
+									$log.error('Could not parse line number ' + i + ': Unescaped whitespace at column ' + key.indexOf(unescapedWhiteSpace) + '.');
+								} else {
+									value = trim_left(naturalLine.substr(matchIndex + keyDelimMatch.toString().length));
+
+									while (value.match(/\\$/) && value.match(/\\$/).toString() === '\\') {
+										value = value.substring(0, value.length - 1);
+										value += trim_left(naturalLines[++i].replace(/\s\s*$/, '')); // right trim
+									}
+									properties[sanitize(key)] = sanitize(value);
+								}
+							}
+						}
+					}
+					return properties;
+				},
+
+				/**
+				 * @method load
+				 * @desc Very simple load method for now.
+				 * @param {String} url
+				 * @param {Object} options
+				 */
+				load: function (url, options) {
+					var req = new XMLHttpRequest(),
+						self = this;
+					req.open("GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), true);
+
+					req.setRequestHeader('Content-Type', 'text/plain;charset=UTF-8');
+
+					req.onreadystatechange = function (event) {
+						var status, err;
+						if (req.readyState === 4) {
+							status = req.status;
+							if (status > 399 && status &lt; 600) {
+								err = new Error(url + ' HTTP status: ' + status);
+								err.xhr = req;
+								err.event = event;
+								$log.error(err);
+							} else {
+								var lang = normalizeLang((options && options.lang) || config.lang);
+								if (!langHash[lang]) {
+									langHash[lang] = angular.extend({}, self.parse(req.responseText));
+								} else {
+									langHash[lang] = angular.extend(langHash[lang], self.parse(req.responseText));
+								}
+							}
+						}
+					};
+					req.send(null);
+				}
+			};
+		}];
+	});
+
+	angular.module('jmdobry.angular-i18n-properties').filter('i18n', ['$log', 'I18nService', function ($log, I18nService) {
+		return function (key, args) {
+			return I18nService.get(key, args);
+		};
+	}]);
 })(window, window.angular);
 </code></pre>
         </article>
@@ -204,13 +279,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-angular-i18n-properties.html">angular-i18n-properties</a></li></ul><h3>Classes</h3><ul><li><a href="I18nService.html">I18nService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#load">load</a></li><li><a href="global.html#parse">parse</a></li><li><a href="global.html#trim_left">trim_left</a></li><li><a href="global.html#trim_right">trim_right</a></li><li><a href="global.html#unescape">unescape</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-angular-i18n-properties.html">angular-i18n-properties</a></li></ul><h3>Classes</h3><ul><li><a href="I18nService.html">I18nService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#config">config</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#load">load</a></li><li><a href="global.html#normalizeLang">normalizeLang</a></li><li><a href="global.html#parse">parse</a></li><li><a href="global.html#sanitize">sanitize</a></li><li><a href="global.html#trim_left">trim_left</a></li><li><a href="global.html#trim_right">trim_right</a></li><li><a href="global.html#unescapeUnicodeChar">unescapeUnicodeChar</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Aug 25 2013 20:15:57 GMT-0600 (MDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Aug 26 2013 23:08:09 GMT-0600 (MDT)
 </footer>
 
 <script> prettyPrint(); </script>
