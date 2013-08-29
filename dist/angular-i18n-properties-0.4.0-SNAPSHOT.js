@@ -1,3 +1,4 @@
+/*jshint boss:true*/
 /**
  * @author Jason Dobry <jason.dobry@gmail.com>
  * @file angular-i18n-properties-0.4.0-SNAPSHOT.js
@@ -35,7 +36,7 @@
 			var langHash = {},
 				unicodeSequenceRegex = /(\\u.{4})/ig,
 				naturalLinesRegex = /[(\r\n)\n\r]+/,
-				escapedWhitespaceRegex = /\\\s+?/,
+				escapedKeyDelimRegex = /\\[\s=:]+?/,
 				keyDelimRegex = /[=:]|\s+[=:]|\s+(?![=:])/;
 
 			/**
@@ -122,9 +123,13 @@
 							value = value.substring(0, i) + '\f' + value.substring((i++) + 2); // form feed
 						} else if (value[i + 1] == '\\') {
 							value = value.substring(0, i) + '\\' + value.substring((i++) + 2); // \
+						} else if (value[i + 1] == '{' || value[i + 1] == '}') {
+							// Leave escaped curly braces where they are because they are NOT part of placeholders
+							// We unescape them in I18nService.get()
 						} else {
 							value = value.substring(0, i) + value.substring(i + 1); // Invalid escape character
 						}
+						i++;
 					}
 				}
 				return value;
@@ -144,7 +149,33 @@
 				 * @return {String}         The value of the given key.
 				 */
 				get: function (key, params, lang) {
-					return langHash[lang || config.lang][key];
+					var value_orig = langHash[key],
+						value = langHash[key],
+						placeholderRegex, match, matchIndex;
+
+					if (params && params.length) {
+						for (var i = 0; i < params.length; i++) {
+							placeholderRegex = new RegExp('\\{' + i + '}');
+							while (match = value.match(placeholderRegex)) {
+								matchIndex = value.indexOf(match.toString());
+								if (matchIndex > 0) {
+									if (value[matchIndex - 1] === '\\') {
+										var errorStr = value_orig.match(/\\\{[0-9]+}/).toString();
+										throw new Error('Invalid unescaped "\\" at column ' + (value_orig.indexOf(errorStr) + errorStr.length - 1) + ' in property value: "' + value_orig + '"');
+									}
+									value = value.substr(0, matchIndex) + params[i] + value.substr(matchIndex + match.toString().length);
+								}
+							}
+						}
+						// Check for unescaped "{" and "}" characters
+						match = value.match(/\\\{|\\}/);
+						if (match) {
+							if (value[value.indexOf(match.toString()) - 1] === '\\') {
+								throw new Error('Invalid unescaped "\\" in property value: "' + value_orig + '"');
+							}
+						}
+					}
+					return value.replace('\\{', '{').replace('\\}', '}');
 				},
 
 				/**
@@ -156,21 +187,21 @@
 				parse: function (file) {
 					var properties = {},
 						naturalLines = file.split(naturalLinesRegex),
-						naturalLine, i, escapedSpaceMatch, keyDelimMatch, unescapedWhiteSpace, matchIndex, key, value;
+						naturalLine, i, escapedKeyDelimMatch, keyDelimMatch, unescapedWhiteSpace, matchIndex, key, value;
 
 					for (i = 0; i < naturalLines.length; i++) {
 						naturalLine = trim_left(naturalLines[i]);
 						var tempKey = '';
 						if (naturalLine[0] !== '#' && naturalLine[0] !== '!') {
 							// This would be much simpler if JavaScript regex supported negative lookbehind
-							escapedSpaceMatch = naturalLine.match(escapedWhitespaceRegex);
+							escapedKeyDelimMatch = naturalLine.match(escapedKeyDelimRegex);
 							keyDelimMatch = naturalLine.match(keyDelimRegex);
 							// handle escaped whitespace in the key
-							if (escapedSpaceMatch && keyDelimMatch) {
-								while (escapedSpaceMatch && keyDelimMatch && naturalLine.indexOf(escapedSpaceMatch.toString()) < naturalLine.indexOf(keyDelimMatch.toString())) {
-									tempKey += naturalLine.substr(0, naturalLine.indexOf(escapedSpaceMatch.toString())) + escapedSpaceMatch.toString()[1];
-									naturalLine = naturalLine.substr(naturalLine.indexOf(escapedSpaceMatch.toString()) + escapedSpaceMatch.toString().length);
-									escapedSpaceMatch = naturalLine.match(escapedWhitespaceRegex);
+							if (escapedKeyDelimMatch && keyDelimMatch) {
+								while (escapedKeyDelimMatch && keyDelimMatch && naturalLine.indexOf(escapedKeyDelimMatch.toString()) < naturalLine.indexOf(keyDelimMatch.toString())) {
+									tempKey += naturalLine.substr(0, naturalLine.indexOf(escapedKeyDelimMatch.toString())) + escapedKeyDelimMatch.toString()[1];
+									naturalLine = naturalLine.substr(naturalLine.indexOf(escapedKeyDelimMatch.toString()) + escapedKeyDelimMatch.toString().length);
+									escapedKeyDelimMatch = naturalLine.match(escapedKeyDelimRegex);
 									keyDelimMatch = naturalLine.match(keyDelimRegex);
 								}
 							}
@@ -190,7 +221,7 @@
 										value = value.substring(0, value.length - 1);
 										value += trim_left(naturalLines[++i].replace(/\s\s*$/, '')); // right trim
 									}
-									properties[sanitize(key)] = sanitize(value);
+									properties[sanitize(key).replace('\\{', '{').replace('\\}', '}')] = sanitize(value);
 								}
 							}
 						}
@@ -207,7 +238,7 @@
 				load: function (url, options) {
 					var req = new XMLHttpRequest(),
 						self = this;
-					req.open("GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), true);
+					req.open("GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), false);
 
 					req.setRequestHeader('Content-Type', 'text/plain;charset=UTF-8');
 
@@ -222,10 +253,10 @@
 								$log.error(err);
 							} else {
 								var lang = normalizeLang((options && options.lang) || config.lang);
-								if (!langHash[lang]) {
-									langHash[lang] = angular.extend({}, self.parse(req.responseText));
+								if (!langHash) {
+									langHash = angular.extend({}, self.parse(req.responseText));
 								} else {
-									langHash[lang] = angular.extend(langHash[lang], self.parse(req.responseText));
+									langHash = angular.extend(langHash, self.parse(req.responseText));
 								}
 							}
 						}
