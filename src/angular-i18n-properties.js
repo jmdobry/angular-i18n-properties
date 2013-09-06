@@ -15,13 +15,35 @@
 	 * @module angular-i18n-properties
 	 * @desc Internationalization (i18n) for Angular.js using the common Java .properties resource bundles.
 	 */
-	var i18n = angular.module('jmdobry.angular-i18n-properties', ['ng']);
+	var i18n = angular.module('jmdobry.angular-i18n-properties', ['ng'])
+		.config(['$logProvider', function ($logProvider) {
+			$logProvider.debugEnabled(true);
+		}]);
 
 	angular.module('jmdobry.angular-i18n-properties').provider('I18nService', function () {
 
-		var config = {};
+		var config = {},
+			defaults = {
+				async: true,
+				cacheMode: 'none',
+				baseUrl: '',
+				lang: navigator.language || navigator.userLanguage,
+				encoding: 'UTF-8'
+			};
 
-		config.lang = navigator.language || navigator.userLanguage;
+		/**
+		 * @method normalizeLang
+		 * @desc Format the language code into the following format: aa_AA.
+		 * @param {String} lang The language code to normalize.
+		 * @returns {String}    The normalized language code.
+		 */
+		function normalizeLang(lang) {
+			lang = lang.toLowerCase();
+			if (lang.length >= 5) {
+				lang = lang.substr(0, 2) + '_' + lang.substr(3).toUpperCase();
+			}
+			return lang;
+		}
 
 		/**
 		 * @method config
@@ -30,28 +52,18 @@
 		 */
 		this.config = function (options) {
 			config = angular.extend(config, options);
+			config.lang = normalizeLang(config.lang);
 		};
 
-		this.$get = ['$log', function ($log) {
+		// Initialize config with the defaults
+		this.config(defaults);
+
+		this.$get = ['$log', '$q', '$http', function ($log, $q, $http) {
 			var langHash = {},
 				unicodeSequenceRegex = /(\\u.{4})/ig,
 				naturalLinesRegex = /[(\r\n)\n\r]+/,
 				escapedKeyDelimRegex = /\\[\s=:]+?/,
 				keyDelimRegex = /[=:]|\s+[=:]|\s+(?![=:])/;
-
-			/**
-			 * @method normalizeLang
-			 * @desc Format the language code into the following format: aa_AA.
-			 * @param {String} lang The language code to normalize.
-			 * @returns {String}    The normalized language code.
-			 */
-			function normalizeLang(lang) {
-				lang = lang.toLowerCase();
-				if (lang.length >= 5) {
-					lang = lang.substr(0, 2) + '_' + lang.substr(3).toUpperCase();
-				}
-				return lang;
-			}
 
 			/**
 			 * @method trim_left
@@ -135,6 +147,21 @@
 				return value;
 			}
 
+			function resolveUrl(filename, opts) {
+				var url = opts.baseUrl;
+
+				if (url && filename[0] !== '/' && opts.baseUrl[opts.baseUrl.length - 1] !== '/') {
+					url += '/';
+				}
+				url += filename;
+
+				if (filename.indexOf('.properties') === -1) {
+					url += '.properties'
+				}
+
+				return url;
+			}
+
 			/**
 			 * @class I18nService
 			 */
@@ -143,15 +170,20 @@
 				/**
 				 * @method get
 				 * @desc Return the value of the given key.
-				 * @param {String} key      The key by which to retrieve the value.
-				 * @param {Array} params    Any parameters that will be inserted into the value.
-				 * @param {String} lang     The language to retrieve the value from.
-				 * @return {String}         The value of the given key.
+				 * @param {String} key          The key by which to retrieve the value.
+				 * @param {Array} [params]      Any parameters that will be inserted into the value.
+				 * @param {Object} [options]    Configuration options for this request.
+				 * @return {String}             The value of the given key.
 				 */
-				get: function (key, params, lang) {
+				get: function (key, params, options) {
 					var value_orig = langHash[key],
 						value = langHash[key],
+						opts = angular.extend(config, options || {}),
 						placeholderRegex, match, matchIndex;
+
+					if (!value) {
+						return '';
+					}
 
 					if (params && params.length) {
 						for (var i = 0; i < params.length; i++) {
@@ -232,36 +264,49 @@
 				/**
 				 * @method load
 				 * @desc Very simple load method for now.
-				 * @param {String} url
-				 * @param {Object} options
+				 * @param {String} filename The name of the file to load, with or without the ".properties" extension.
+				 * @param {Object} options  Configuration options for this request.
 				 */
-				load: function (url, options) {
-					var req = new XMLHttpRequest(),
-						self = this;
-					req.open("GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), false);
+				load: function (filename, options) {
+					var deferred = $q.defer(),
+						opts = angular.extend(config, options || {}),
+						url = resolveUrl(filename, opts),
+						self = this,
+						cache = false,
+						promises = [];
 
-					req.setRequestHeader('Content-Type', 'text/plain;charset=UTF-8');
+					promises.push(deferred);
 
-					req.onreadystatechange = function (event) {
-						var status, err;
-						if (req.readyState === 4) {
-							status = req.status;
-							if (status > 399 && status < 600) {
-								err = new Error(url + ' HTTP status: ' + status);
-								err.xhr = req;
-								err.event = event;
-								$log.error(err);
-							} else {
-								var lang = normalizeLang((options && options.lang) || config.lang);
-								if (!langHash) {
-									langHash = angular.extend({}, self.parse(req.responseText));
-								} else {
-									langHash = angular.extend(langHash, self.parse(req.responseText));
-								}
-							}
+					switch (opts.cacheMode) {
+						case 'none':
+							url += ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
+							break;
+						case 'browser':
+							break;
+						case 'angular':
+							cache = true;
+							break;
+						default:
+					}
+					$http.get(url, {
+						cache: cache,
+						headers: {
+							'Content-Type': 'text/plain;charset=' + opts.encoding
 						}
-					};
-					req.send(null);
+					}).success(function (data, status, config, headers) {
+							$log.debug(data, status, config, headers);
+							var lang = normalizeLang(opts.lang);
+							if (!langHash) {
+								langHash = angular.extend({}, self.parse(data));
+							} else {
+								langHash = angular.extend(langHash, self.parse(data));
+							}
+							deferred.resolve();
+						}).error(function (data, status, config, headers) {
+							$log.error('Failed to load "' + url + '"');
+							deferred.reject(data, status, config, headers);
+						});
+					return promises;
 				}
 			};
 		}];
