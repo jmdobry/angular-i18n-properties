@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html data-ng-app="app">
+<head>
+    <title>angular-i18n-properties Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <!-- Bootstrap -->
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="github.css" rel="stylesheet">
+    <style>
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none;
+        }
+        .notFound h4 {
+            color: red;
+        }
+    </style>
+    <script src="highlight.pack.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+</head>
+<body data-ng-cloak data-ng-controller="DemoCtrl">
+<header class="navbar navbar-inverse header-main">
+    <div class="container">
+        <a data-ng-href="#" class="navbar-brand" style="max-width: 300px;">
+            angular-i18n-properties Demo
+        </a>
+        <ul class="nav navbar-nav pull-right">
+            <li>
+                <a data-ng-href="https://jmdobry.github.io/angular-i18n-properties">
+                    Back to docs
+                </a>
+            </li>
+        </ul>
+    </div>
+</header>
+<article class="container">
+    <section class="row" data-ng-repeat="file in files | orderBy:'filename'" data-ng-class="{'text-danger': file.contents === '404 - Not Found'}">
+        <section class="col-lg-4">
+            <h4><strong>Filename:</strong> {{ file.filename }}</h4>
+            <pre>
+                <code class="properties">{{ file.contents }}</code>
+            </pre>
+        </section>
+        <section class="col-lg-4">
+            <h4><strong>Language:</strong> {{ file.lang }}</h4>
+            <pre><code class="json" data-ng-bind-html-unsafe="file.properties"></code></pre>
+        </section>
+        <section class="col-lg-4" data-ng-if="file.contents === '404 - Not Found'">
+            <h4>Unsupported locale</h4>
+            This language file does not exist on the server, but angular-i18n-properties.js didn't know that...
+        </section>
+        <section class="col-lg-4" data-ng-if="file.contents !== '404 - Not Found'">
+            <h4>Key Delimiters</h4>
+            <p>{{ file.filename + '.text' | i18n }}</p>
+        </section>
+    </section>
+</article>
+<script src="angular-1.1.5.min.js"></script>
+<script src="../src/angular-i18n-properties.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>
