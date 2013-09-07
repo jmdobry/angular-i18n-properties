@@ -1,0 +1,24 @@
+{
+  "author": "Jason Dobry",
+  "name": "angular-i18n-properties",
+  "description": "Internationalization (i18n) for Angular.js using the common Java .properties resource bundles.",
+  "version": "0.4.0-alpha",
+  "homepage": "http://jmdobry.github.io/angular-i18n-properties/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jmdobry/angular-i18n-properties.git"
+  },
+  "main": "./src/angular-i18n-properties.js",
+  "ignore": [
+    ".idea/",
+    "*.iml",
+    "coverage/",
+    "node_modules/",
+    "bower_components/",
+    "test/",
+    "libpeerconnection.log",
+    ".gitignore",
+    ".travis.yml",
+	".DS_Store"
+  ]
+}
