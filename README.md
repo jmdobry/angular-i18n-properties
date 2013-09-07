@@ -1,4 +1,4 @@
-angular-i18n-properties (Pre-release 0.6.0-SNAPSHOT)
+angular-i18n-properties (0.4.0-alpha)
 =======================
 
 # Not for production use (yet)
@@ -36,9 +36,9 @@ _put list of features here_
 ## Status
 | Version | Branch  | Build status                                                                                                                                                              | Test Coverage |
 | ------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| 0.4.0-SNAPSHOT   | [master](https://github.com/jmdobry/angular-i18n-properties)  | [![Build Status](https://travis-ci.org/jmdobry/angular-i18n-properties.png?branch=master)](https://travis-ci.org/jmdobry/angular-i18n-properties) | [Test Coverage](http://jmdobry.github.io/angular-i18n-properties/coverage/) |
-| 0.4.0-SNAPSHOT   | [develop](https://github.com/jmdobry/angular-i18n-properties/tree/develop) | [![Build Status](https://travis-ci.org/jmdobry/angular-i18n-properties.png?branch=develop)](https://travis-ci.org/jmdobry/angular-i18n-properties) | |
-| 0.4.0-SNAPSHOT   | [all](https://drone.io/github.com/jmdobry/angular-i18n-properties) | [![Build Status](https://drone.io/github.com/jmdobry/angular-i18n-properties/status.png)](https://drone.io/github.com/jmdobry/angular-i18n-properties/latest)
+| 0.4.0-alpha   | [master](https://github.com/jmdobry/angular-i18n-properties)  | [![Build Status](https://travis-ci.org/jmdobry/angular-i18n-properties.png?branch=master)](https://travis-ci.org/jmdobry/angular-i18n-properties) | [Test Coverage](http://jmdobry.github.io/angular-i18n-properties/coverage/) |
+| 0.4.0-alpha   | [develop](https://github.com/jmdobry/angular-i18n-properties/tree/develop) | [![Build Status](https://travis-ci.org/jmdobry/angular-i18n-properties.png?branch=develop)](https://travis-ci.org/jmdobry/angular-i18n-properties) | |
+| 0.4.0-alpha   | [all](https://drone.io/github.com/jmdobry/angular-i18n-properties) | [![Build Status](https://drone.io/github.com/jmdobry/angular-i18n-properties/status.png)](https://drone.io/github.com/jmdobry/angular-i18n-properties/latest)
 
 <a name='download'></a>
 ## Download
@@ -46,8 +46,8 @@ _put list of features here_
 #### Latest Stable Version
 | Type          | File | Size |
 | ------------- | ----------------- | ------------------- | ---- |
-| Production    | [angular-i18n-properties-0.4.0-SNAPSHOT.min.js](https://raw.github.com/jmdobry/angular-i18n-properties/master/dist/angular-i18n-properties-0.4.0-SNAPSHOT.min.js) | 6 KB |
-| Development   | [angular-i18n-properties-0.4.0-SNAPSHOT.js](https://raw.github.com/jmdobry/angular-i18n-properties/master/dist/angular-i18n-properties-0.4.0-SNAPSHOT.js) | 34 KB |
+| Production    | [angular-i18n-properties-0.4.0-alpha.min.js](https://raw.github.com/jmdobry/angular-i18n-properties/master/dist/angular-i18n-properties-0.4.0-alpha.min.js) | 3.86 KB |
+| Development   | [angular-i18n-properties-0.4.0-alpha.js](https://raw.github.com/jmdobry/angular-i18n-properties/master/dist/angular-i18n-properties-0.4.0-alpha.js) | 13 KB |
 
 <a name='installation'></a>
 ## Installation
@@ -57,7 +57,7 @@ _put list of features here_
 bower install angular-i18n-properties
 ```
 
-Include `src/angular-i18n-properties.js` on your web page after `angular.js`.
+Include `src/angular-i18n-properties.js` on your web page after you include `angular.js`.
 
 #### Manual install
 Get angular-i18n-properties from the [Download](#download) section and include it on your web page after `angular.js`.
@@ -81,13 +81,10 @@ See [angular-i18n-properties](http://jmdobry.github.io/angular-i18n-properties/d
 <a name='roadmap'></a>
 ## Roadmap
 
-#### 0.4.0
-- Core features complete.
-
-#### 0.6.0
+#### 0.6.0-alpha
 - Unit tests complete.
 
-#### 0.8.0
+#### 0.8.0-beta
 - Demo and documentation complete
 
 #### 1.0.0
@@ -96,7 +93,10 @@ See [angular-i18n-properties](http://jmdobry.github.io/angular-i18n-properties/d
 <a name='changelog'></a>
 ## Changelog
 
-_No changes to report_
+#### 0.4.0-alpha - 06 September 2013
+- Wrote file parser. #1
+- Wrote file loader. #2
+- Wrote i18n filter. #3
 
 <a name='contributing'></a>
 ## Contributing
