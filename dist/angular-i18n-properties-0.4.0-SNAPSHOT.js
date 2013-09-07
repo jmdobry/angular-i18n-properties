@@ -19,9 +19,28 @@
 
 	angular.module('jmdobry.angular-i18n-properties').provider('I18nService', function () {
 
-		var config = {};
+		var config = {},
+			defaults = {
+				async: true,
+				cacheMode: 'none',
+				baseUrl: '',
+				lang: navigator.language || navigator.userLanguage,
+				encoding: 'UTF-8'
+			};
 
-		config.lang = navigator.language || navigator.userLanguage;
+		/**
+		 * @method normalizeLang
+		 * @desc Format the language code into the following format: aa_AA.
+		 * @param {String} lang The language code to normalize.
+		 * @returns {String} The normalized language code.
+		 */
+		function normalizeLang(lang) {
+			lang = lang.toLowerCase();
+			if (lang.length >= 5) {
+				lang = lang.substr(0, 2) + '_' + lang.substr(3).toUpperCase();
+			}
+			return lang;
+		}
 
 		/**
 		 * @method config
@@ -29,10 +48,14 @@
 		 * @param {Object} options
 		 */
 		this.config = function (options) {
-			config = angular.extend(config, options);
+			angular.extend(config, options);
+			config.lang = normalizeLang(config.lang);
 		};
 
-		this.$get = ['$log', function ($log) {
+		// Initialize config with the defaults
+		this.config(defaults);
+
+		this.$get = ['$log', '$q', '$http', function ($log, $q, $http) {
 			var langHash = {},
 				unicodeSequenceRegex = /(\\u.{4})/ig,
 				naturalLinesRegex = /[(\r\n)\n\r]+/,
@@ -40,24 +63,10 @@
 				keyDelimRegex = /[=:]|\s+[=:]|\s+(?![=:])/;
 
 			/**
-			 * @method normalizeLang
-			 * @desc Format the language code into the following format: aa_AA.
-			 * @param {String} lang The language code to normalize.
-			 * @returns {String}    The normalized language code.
-			 */
-			function normalizeLang(lang) {
-				lang = lang.toLowerCase();
-				if (lang.length >= 5) {
-					lang = lang.substr(0, 2) + '_' + lang.substr(3).toUpperCase();
-				}
-				return lang;
-			}
-
-			/**
 			 * @method trim_left
 			 * @desc Strip leading whitespace from the given string.
-			 * @param {String} value    The string to trim.
-			 * @returns {String}        The trimmed string.
+			 * @param {String} value The string to trim.
+			 * @returns {String} The trimmed string.
 			 */
 			function trim_left(value) {
 				return typeof value == 'string' ? value.replace(/^\s*/, '') : value;
@@ -66,8 +75,8 @@
 			/**
 			 * @method trim_right
 			 * @desc Strip trailing whitespace from the given string.
-			 * @param {String} value    The string to trim.
-			 * @returns {String}        The trimmed string.
+			 * @param {String} value The string to trim.
+			 * @returns {String} The trimmed string.
 			 */
 			function trim_right(value) {
 				return typeof value == 'string' ? value.replace(/\s*$/, '') : value;
@@ -76,8 +85,8 @@
 			/**
 			 * @method unescapeUnicodeChar
 			 * @desc Unescape a unicode characters.
-			 * @param {String} str  The string to unescape.
-			 * @returns {string}    The unescaped string.
+			 * @param {String} str The string to unescape.
+			 * @returns {string} The unescaped string.
 			 */
 			function unescapeUnicodeChar(str) {
 				// unescape unicode codes
@@ -98,8 +107,8 @@
 			/**
 			 * @method sanitize
 			 * @desc Unescape valid escape characters and drop the backslash for invalid escape characters.
-			 * @param {String} value    The string to unescape.
-			 * @returns {String}        The unescaped string.
+			 * @param {String} value The string to unescape.
+			 * @returns {String} The unescaped string.
 			 */
 			function sanitize(value) {
 				if (typeof value == 'string') {
@@ -136,6 +145,46 @@
 			}
 
 			/**
+			 * @method resolveUrl
+			 * @desc Turns the given filename and options into a usable url.
+			 * @param {String} filename The name of the file to be in the url.
+			 * @param {Object} opts Configuration options for this request.
+			 * @returns {String} A usable url for the file with the given filename.
+			 */
+			function resolveUrl(filename, opts) {
+				var url = opts.baseUrl;
+				if (opts.lang) {
+					if (url && url[url.length - 1] !== '/') {
+						url += '/';
+					}
+					url = url + opts.lang + '/';
+				}
+				if (url && filename[0] !== '/' && url[url.length - 1] !== '/') {
+					url += '/';
+				}
+				url += filename;
+				if (filename.indexOf('.properties') === -1) {
+					url += '.properties';
+				}
+				return url;
+			}
+
+			/**
+			 * @method getValue
+			 * @desc Get a value for the specified key and language.
+			 * @param {String} key The key of the value to retrieve.
+			 * @param {String} lang The locale where we're to look for the key-value pair.
+			 * @returns {String} The value of the specified key and language.
+			 */
+			function getValue(key, lang) {
+				lang = lang || 'default';
+				if (!langHash[lang]) {
+					langHash[lang] = {};
+				}
+				return langHash[lang][key];
+			}
+
+			/**
 			 * @class I18nService
 			 */
 			return {
@@ -143,15 +192,35 @@
 				/**
 				 * @method get
 				 * @desc Return the value of the given key.
-				 * @param {String} key      The key by which to retrieve the value.
-				 * @param {Array} params    Any parameters that will be inserted into the value.
-				 * @param {String} lang     The language to retrieve the value from.
-				 * @return {String}         The value of the given key.
+				 * @param {String} key The key by which to retrieve the value.
+				 * @param {Array} [params] Any parameters that will be inserted into the value.
+				 * @param {Object} [options] Configuration options for this request.
+				 * @return {String} The value of the given key.
 				 */
-				get: function (key, params, lang) {
-					var value_orig = langHash[key],
-						value = langHash[key],
-						placeholderRegex, match, matchIndex;
+				get: function (key, params, options) {
+					var opts = angular.extend({}, config, options || {}),
+						lang = normalizeLang(opts.lang) || 'default',
+						parts = lang.split('_'),
+						placeholderRegex, match, matchIndex, value, value_orig;
+
+					value_orig = value = getValue(key, lang);
+
+					// Value for specified key isn't in top-level locale
+					if (!value && value !== '' && parts.length > 1) {
+						lang = parts[0];
+						value_orig = value = getValue(key, lang);
+					}
+
+					// Value for specified key isn't in mid-level locale
+					if (!value && value !== '') {
+						lang = 'default';
+						value_orig = value = getValue(key, lang);
+					}
+
+					// Value for specified key isn't anywhere to be found...
+					if (!value && value !== '') {
+						return '';
+					}
 
 					if (params && params.length) {
 						for (var i = 0; i < params.length; i++) {
@@ -181,8 +250,8 @@
 				/**
 				 * @method parse
 				 * @desc Parse the given .properties file and return the hash of key-value pairs.
-				 * @param {String} file     The .properties file to parse.
-				 * @returns {Object} The    key-value pairs of the parsed .properties file.
+				 * @param {String} file The .properties file to parse.
+				 * @returns {Object} The key-value pairs of the parsed .properties file.
 				 */
 				parse: function (file) {
 					var properties = {},
@@ -232,36 +301,62 @@
 				/**
 				 * @method load
 				 * @desc Very simple load method for now.
-				 * @param {String} url
-				 * @param {Object} options
+				 * @param {String} filename The name of the file to load, with or without the ".properties" extension.
+				 * @param {Object} options Configuration options for this request.
 				 */
-				load: function (url, options) {
-					var req = new XMLHttpRequest(),
-						self = this;
-					req.open("GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), false);
+				load: function (filename, options) {
+					var deferred = $q.defer(),
+						opts = angular.extend({}, config, options || {}),
+						url = resolveUrl(filename, opts),
+						self = this,
+						cache = false,
+						promises = [deferred.promise],
+						lang = normalizeLang(opts.lang),
+						parts = lang.split('_');
 
-					req.setRequestHeader('Content-Type', 'text/plain;charset=UTF-8');
-
-					req.onreadystatechange = function (event) {
-						var status, err;
-						if (req.readyState === 4) {
-							status = req.status;
-							if (status > 399 && status < 600) {
-								err = new Error(url + ' HTTP status: ' + status);
-								err.xhr = req;
-								err.event = event;
-								$log.error(err);
-							} else {
-								var lang = normalizeLang((options && options.lang) || config.lang);
-								if (!langHash) {
-									langHash = angular.extend({}, self.parse(req.responseText));
-								} else {
-									langHash = angular.extend(langHash, self.parse(req.responseText));
-								}
-							}
+					switch (opts.cacheMode) {
+						case 'none':
+							url += ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
+							break;
+						case 'browser':
+							break;
+						case 'angular':
+							cache = true;
+							break;
+						default:
+					}
+					$http.get(url, {
+						cache: cache,
+						headers: {
+							'Content-Type': 'text/plain;charset=' + opts.encoding
 						}
-					};
-					req.send(null);
+					}).success(function (data, status, config, headers) {
+							if (!langHash[lang || 'default']) {
+								langHash[lang || 'default'] = {};
+							}
+							angular.extend(langHash[lang || 'default'], self.parse(data));
+							deferred.resolve({
+								filename: filename,
+								lang: lang || 'default',
+								contents: data
+							}, status, config, headers);
+						}).error(function (data, status, config, headers) {
+							$log.error('Failed to load "' + url + '"');
+							deferred.reject({
+								filename: filename,
+								lang: lang,
+								contents: '404 - Not Found'
+							}, status, config, headers);
+						});
+
+					if (parts.length > 1) {
+						opts.lang = parts[0];
+						promises = promises.concat(this.load(filename, opts));
+					} else if (lang) {
+						opts.lang = '';
+						promises = promises.concat(this.load(filename, opts));
+					}
+					return promises;
 				}
 			};
 		}];

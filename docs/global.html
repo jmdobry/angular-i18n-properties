@@ -180,7 +180,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 26
+        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 45
     </li></ul></dd>
     
     
@@ -204,7 +204,7 @@
         
             
 <dt>
-    <h4 class="name" id="get"><span class="type-signature"></span>get<span class="signature">(key, params, lang)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    <h4 class="name" id="get"><span class="type-signature"></span>get<span class="signature">(key, <span class="optional">params</span>, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {String}</span></h4>
     
     
 </dt>
@@ -213,6 +213,217 @@
     
     <div class="description">
         Return the value of the given key.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last">The key by which to retrieve the value.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last">Any parameters that will be inserted into the value.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last">Configuration options for this request.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 192
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The value of the given key.
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="getValue"><span class="type-signature"></span>getValue<span class="signature">(key, lang)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Get a value for the specified key and language.
     </div>
     
 
@@ -262,30 +473,7 @@
             
             
             
-            <td class="description last">The key by which to retrieve the value.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>params</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">Any parameters that will be inserted into the value.</td>
+            <td class="description last">The key of the value to retrieve.</td>
         </tr>
 	
 	
@@ -308,7 +496,7 @@
             
             
             
-            <td class="description last">The language to retrieve the value from.</td>
+            <td class="description last">The locale where we're to look for the key-value pair.</td>
         </tr>
 	
 	
@@ -339,7 +527,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 143
+        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 172
     </li></ul></dd>
     
     
@@ -360,7 +548,7 @@
     
             
 <div class="param-desc">
-    The value of the given key.
+    The value of the specified key and language.
 </div>
 
 
@@ -385,7 +573,7 @@
         
             
 <dt>
-    <h4 class="name" id="load"><span class="type-signature"></span>load<span class="signature">(url, options)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="load"><span class="type-signature"></span>load<span class="signature">(filename, options)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -427,7 +615,7 @@
 	
         <tr>
             
-                <td class="name"><code>url</code></td>
+                <td class="name"><code>filename</code></td>
             
             
             <td class="type">
@@ -443,7 +631,7 @@
             
             
             
-            <td class="description last"></td>
+            <td class="description last">The name of the file to load, with or without the ".properties" extension.</td>
         </tr>
 	
 	
@@ -466,7 +654,7 @@
             
             
             
-            <td class="description last"></td>
+            <td class="description last">Configuration options for this request.</td>
         </tr>
 	
 	
@@ -497,7 +685,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 232
+        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 301
     </li></ul></dd>
     
     
@@ -610,7 +798,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 42
+        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 31
     </li></ul></dd>
     
     
@@ -745,7 +933,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 181
+        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 250
     </li></ul></dd>
     
     
@@ -766,7 +954,7 @@
     
             
 <div class="param-desc">
-    The    key-value pairs of the parsed .properties file.
+    The key-value pairs of the parsed .properties file.
 </div>
 
 
@@ -778,6 +966,164 @@
 	<dd>
 		
 <span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="resolveUrl"><span class="type-signature"></span>resolveUrl<span class="signature">(filename, opts)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Turns the given filename and options into a usable url.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>filename</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The name of the file to be in the url.</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>opts</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Configuration options for this request.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 147
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    A usable url for the file with the given filename.
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
 
 
 	</dd>
@@ -880,7 +1226,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 98
+        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 107
     </li></ul></dd>
     
     
@@ -1015,7 +1361,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 56
+        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 65
     </li></ul></dd>
     
     
@@ -1150,7 +1496,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 66
+        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 75
     </li></ul></dd>
     
     
@@ -1285,7 +1631,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 76
+        <a href="angular-i18n-properties-0.4.0-SNAPSHOT.js.html">angular-i18n-properties-0.4.0-SNAPSHOT.js</a>, line 85
     </li></ul></dd>
     
     
@@ -1344,13 +1690,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-angular-i18n-properties.html">angular-i18n-properties</a></li></ul><h3>Classes</h3><ul><li><a href="I18nService.html">I18nService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#config">config</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#load">load</a></li><li><a href="global.html#normalizeLang">normalizeLang</a></li><li><a href="global.html#parse">parse</a></li><li><a href="global.html#sanitize">sanitize</a></li><li><a href="global.html#trim_left">trim_left</a></li><li><a href="global.html#trim_right">trim_right</a></li><li><a href="global.html#unescapeUnicodeChar">unescapeUnicodeChar</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-angular-i18n-properties.html">angular-i18n-properties</a></li></ul><h3>Classes</h3><ul><li><a href="I18nService.html">I18nService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#config">config</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getValue">getValue</a></li><li><a href="global.html#load">load</a></li><li><a href="global.html#normalizeLang">normalizeLang</a></li><li><a href="global.html#parse">parse</a></li><li><a href="global.html#resolveUrl">resolveUrl</a></li><li><a href="global.html#sanitize">sanitize</a></li><li><a href="global.html#trim_left">trim_left</a></li><li><a href="global.html#trim_right">trim_right</a></li><li><a href="global.html#unescapeUnicodeChar">unescapeUnicodeChar</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Wed Aug 28 2013 21:53:06 GMT-0600 (MDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Sep 06 2013 19:03:10 GMT-0600 (MDT)
 </footer>
 
 <script> prettyPrint(); </script>

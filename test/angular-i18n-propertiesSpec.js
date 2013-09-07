@@ -39,7 +39,8 @@ describe('angular-i18n-properties', function () {
 					expect(properties).toEqual({
 						'oneline': '1 line',
 						'multiline': 'I have four lines.',
-						'multiline with  key spaces': 'line 1line 2'
+						'multiline with  key spaces': 'line 1line 2',
+						'multiline.properties.text': 'Here I would write some interesting stuff about how angular-i18n-properties.js properly parses multi-line values.'
 					});
 				});
 			});
@@ -75,7 +76,8 @@ describe('angular-i18n-properties', function () {
 						'equal=': 'value',
 						'=:': ':=',
 						':=': '=:',
-						'space with equal and colon =:': 'value'
+						'space with equal and colon =:': 'value',
+						'key_delimiters.properties.text': 'Here I would write some interesting stuff about how angular-i18n-properties.js properly parses key delimiters.'
 					});
 				});
 			});
@@ -83,7 +85,8 @@ describe('angular-i18n-properties', function () {
 			it('should correctly unescape keys and values', function () {
 				getProperties('unescaping.properties', function (properties) {
 					expect(properties).toEqual({
-						'curly{}braces': 'curly\\{0\\}braces\\{\\{\\}\\}'
+						'curly{}braces': 'curly\\{0\\}braces\\{\\{\\}\\}',
+						'unescaping.properties.text': 'Here I would write some interesting stuff about how angular-i18n-properties.js properly un-escapes encoded values.'
 					});
 				});
 			});
@@ -97,7 +100,8 @@ describe('angular-i18n-properties', function () {
 						'two same': 'parameters {0}{0}',
 						'two different': 'parameters {0}{1}',
 						'multiple of two different': 'parameters {0}{1}{0}{1}',
-						'one real': 'one fake parameter \\{0\\}{0}'
+						'one real': 'one fake parameter \\{0\\}{0}',
+						'parameters.properties.text': 'Here I would write some interesting stuff about how angular-i18n-properties.js properly parameterizes values.'
 					});
 				});
 			});

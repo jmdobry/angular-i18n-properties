@@ -1,7 +1,9 @@
-angular-i18n-properties (Pre-release 0.4.0-SNAPSHOT)
+angular-i18n-properties (Pre-release 0.6.0-SNAPSHOT)
 =======================
 
-Internationalization (i18n) for Angular.js using the common Java .properties resource bundles.
+# Not for production use (yet)
+
+Internationalization (i18n) for Angular.js using the common Java .properties resource bundle file format.
 
 The goal of the project is to solve a general problem, not satisfy a specific scenario.
 

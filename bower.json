@@ -18,6 +18,7 @@
     "test/",
     "libpeerconnection.log",
     ".gitignore",
-    ".travis.yml"
+    ".travis.yml",
+	".DS_Store"
   ]
 }
